@@ -10,7 +10,44 @@ type UserStore interface{
 }
 
 type ProductStore interface{
+		GetProductByID(id int) (*Product, error)
+	GetProductsByID(ids []int) ([]Product, error)
 	GetProducts() ([]*Product, error)
+	CreateProduct(CreateProductPayload) error
+	UpdateProduct(Product) error
+}
+
+type CartStore interface{
+	CreateOrder(Order) (int,error)
+	CreateOrderItem(OrderItem) error
+}
+
+type OrderStore interface {
+	CreateOrder(Order) (int, error)
+	CreateOrderItem(OrderItem) error
+}
+
+type Order struct{
+	ID        int    `json:"id"`
+	UserID    int    `json:"userId"`
+	Total     float64 `json:"total"`
+	Status    string `json:"status"`	
+	Address   string `json:"address"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type OrderItem struct{
+	ID        int    `json:"id"`
+	OrderID   int    `json:"orderId"`
+	ProductID int    `json:"productId"`
+	Quantity  int    `json:"quantity"`
+	Price     float64 `json:"price"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type CartCheckoutItem struct {
+	ProductID int `json:"productID"`
+	Quantity  int `json:"quantity"`
 }
 
 type Product struct {
@@ -40,8 +77,20 @@ type RegisterUserPayload struct {
 	Password  string `json:"password" validate:"required,min=3,max=20"`
 }
 
+type CreateProductPayload struct {
+	Name        string  `json:"name" validate:"required"`
+	Description string  `json:"description"`
+	Image       string  `json:"image"`
+	Price       float64 `json:"price" validate:"required"`
+	Quantity    int     `json:"quantity" validate:"required"`
+}
+
 type LoginUserPayload struct {
 	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required"`
 }
 
+
+type CartCheckoutPayload struct {
+	Items []CartCheckoutItem `json:"items" validate:"required"`
+}
