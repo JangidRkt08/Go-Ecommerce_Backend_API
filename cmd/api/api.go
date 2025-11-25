@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jangidRkt08/go-Ecom/service/cart"
+	"github.com/jangidRkt08/go-Ecom/service/order"
 	"github.com/jangidRkt08/go-Ecom/service/product"
 	"github.com/jangidRkt08/go-Ecom/service/user"
 )
@@ -31,8 +33,12 @@ func (s *APIserver) Run() error{
 	userHandler.RegisterRoutes(subrouter)
 
 	productStore := product.NewStore(s.db)
-	productHandler := product.NewHandler(productStore)
+	productHandler := product.NewHandler(productStore, userStore)
 	productHandler.RegisterRoutes(subrouter)
+
+	orderStore := order.NewStore(s.db)
+	cartHandler := cart.NewHandler( productStore, orderStore, userStore)
+	cartHandler.RegisterRoutes(subrouter)
 	
 	return http.ListenAndServe(s.addr, router)
 }
